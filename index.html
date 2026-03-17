@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist LIDL — Generador</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amarillo: #FFD700;
+    --azul: #0050AA;
+    --azul-oscuro: #003580;
+    --blanco: #ffffff;
+    --gris: #f2f4f8;
+    --gris-medio: #dde2ec;
+    --texto: #1a1a2e;
+    --sombra: 0 4px 32px rgba(0,53,128,0.11);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--gris);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 60px;
+  }
+
+  header {
+    width: 100%;
+    background: var(--azul);
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 4px 20px rgba(0,53,128,0.2);
+    margin-bottom: 48px;
+  }
+
+  .header-stripe { width: 12px; background: var(--amarillo); flex-shrink: 0; }
+
+  .header-content {
+    padding: 22px 36px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .lidl-logo {
+    width: 60px; height: 60px;
+    background: var(--amarillo);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+
+  .lidl-logo span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 20px;
+    color: var(--azul); letter-spacing: -1px;
+  }
+
+  .header-text h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 26px;
+    color: var(--blanco); letter-spacing: 1px;
+    text-transform: uppercase; line-height: 1;
+  }
+
+  .header-text p {
+    font-size: 12px; color: rgba(255,255,255,0.6);
+    margin-top: 5px; font-weight: 300; letter-spacing: 0.5px;
+  }
+
+  .card {
+    background: var(--blanco);
+    border-radius: 18px;
+    box-shadow: var(--sombra);
+    padding: 40px 44px;
+    width: 100%; max-width: 560px;
+    border-top: 5px solid var(--amarillo);
+  }
+
+  .card h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 18px;
+    color: var(--azul-oscuro);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 28px; padding-bottom: 14px;
+    border-bottom: 2px solid var(--gris);
+  }
+
+  .field { margin-bottom: 18px; }
+
+  label.field-label {
+    display: block;
+    font-size: 11px; font-weight: 600;
+    color: var(--azul); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 7px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gris-medio);
+    border-radius: 9px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px; color: var(--texto);
+    background: var(--blanco);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(0,80,170,0.1);
+  }
+
+  input[type="text"]::placeholder { color: #bbb; }
+
+  .sep { height: 1px; background: var(--gris); margin: 24px 0; }
+
+  .toggle-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--gris); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 28px;
+    cursor: pointer; user-select: none;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .toggle-row:hover { border-color: var(--gris-medio); }
+
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--gris-medio); border-radius: 24px;
+    cursor: pointer; transition: background 0.2s;
+  }
+
+  .slider::before {
+    content: ''; position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: white; border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .toggle input:checked + .slider { background: var(--azul); }
+  .toggle input:checked + .slider::before { transform: translateX(20px); }
+
+  .toggle-label { font-size: 14px; color: var(--texto); font-weight: 500; }
+  .toggle-label small { display: block; font-size: 12px; color: #999; font-weight: 400; margin-top: 2px; }
+
+  .btn-generar {
+    width: 100%; padding: 16px;
+    background: var(--azul); color: white;
+    border: none; border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 18px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-generar:hover { background: var(--azul-oscuro); }
+  .btn-generar:active { transform: scale(0.98); }
+  .btn-generar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .banner {
+    display: none; margin-top: 20px;
+    border-radius: 10px; padding: 14px 18px;
+    text-align: center; font-size: 14px; font-weight: 500;
+  }
+
+  .banner.success {
+    background: #e8f5e9; border: 2px solid #4CAF50; color: #2e7d32;
+  }
+
+  .banner.error {
+    background: #fff3f3; border: 2px solid #e53935; color: #c62828;
+  }
+
+  .banner span { font-size: 22px; display: block; margin-bottom: 4px; }
+
+  .nota { font-size: 12px; color: #bbb; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-content">
+    <div class="lidl-logo"><span>LIDL</span></div>
+    <div class="header-text">
+      <h1>Generador de Checklists</h1>
+      <p>Sistema de Detección de Intrusión — Mantenimiento Trimestral</p>
+    </div>
+  </div>
+</header>
+
+<div class="card">
+  <h2>📋 Datos del Mantenimiento</h2>
+
+  <div class="field">
+    <label class="field-label">Nº de Tienda</label>
+    <input type="text" id="num_tienda" placeholder="Ej: 5041" maxlength="10">
+  </div>
+
+  <div class="field">
+    <label class="field-label">Dirección completa</label>
+    <input type="text" id="direccion" placeholder="Ej: C/ Torres Quevedo 6, Móstoles">
+  </div>
+
+  <div class="field">
+    <label class="field-label">Fecha del mantenimiento</label>
+    <input type="text" id="fecha" placeholder="DD/MM/AAAA" maxlength="10">
+  </div>
+
+  <div class="field">
+    <label class="field-label">Técnico</label>
+    <input type="text" id="tecnico" placeholder="Nombre y apellidos del técnico">
+  </div>
+
+  <div class="sep"></div>
+
+  <label class="field-label" style="margin-bottom:10px;">Configuración del sistema</label>
+  <div class="toggle-row" onclick="document.getElementById('sin_lector').click()">
+    <label class="toggle" onclick="event.stopPropagation()">
+      <input type="checkbox" id="sin_lector">
+      <span class="slider"></span>
+    </label>
+    <div class="toggle-label">
+      Sin lector (Llavín / No lectores)
+      <small>Marca "Lectores y semáforos" como n/a en vez de Bien</small>
+    </div>
+  </div>
+
+  <button class="btn-generar" id="btnGenerar" onclick="generar()">
+    <div class="btn-inner">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnTexto">⬇ Generar y Descargar Excel</span>
+    </div>
+  </button>
+
+  <div class="banner success" id="successBanner">
+    <span>✅</span>
+    <p id="successMsg">¡Checklist generado correctamente!</p>
+  </div>
+
+  <div class="banner error" id="errorBanner"></div>
+
+  <p class="nota">El archivo se descargará automáticamente al pulsar el botón.</p>
+</div>
+
+<script>
+  // Formato automático DD/MM/AAAA
+  document.getElementById('fecha').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 2 && v.length <= 4) v = v.slice(0,2) + '/' + v.slice(2);
+    else if (v.length > 4) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4,8);
+    e.target.value = v;
+  });
+
+  async function generar() {
+    const num_tienda = document.getElementById('num_tienda').value.trim();
+    const direccion  = document.getElementById('direccion').value.trim();
+    const fecha      = document.getElementById('fecha').value.trim();
+    const tecnico    = document.getElementById('tecnico').value.trim();
+    const sin_lector = document.getElementById('sin_lector').checked;
+
+    const successBanner = document.getElementById('successBanner');
+    const errorBanner   = document.getElementById('errorBanner');
+    successBanner.style.display = 'none';
+    errorBanner.style.display   = 'none';
+
+    if (!num_tienda || !direccion || !fecha || !tecnico) {
+      errorBanner.textContent = '⚠️ Por favor, rellena todos los campos.';
+      errorBanner.style.display = 'block';
+      return;
+    }
+
+    const btn     = document.getElementById('btnGenerar');
+    const spinner = document.getElementById('spinner');
+    const btnTxt  = document.getElementById('btnTexto');
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnTxt.textContent = 'Generando...';
+
+    try {
+      const response = await fetch('/generar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ num_tienda, direccion, fecha, tecnico, sin_lector })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Error al generar el archivo');
+      }
+
+      const blob = await response.blob();
+      const cd = response.headers.get('Content-Disposition') || '';
+      const match = cd.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+      const filename = match ? decodeURIComponent(match[1].replace(/"/g,'')) : `Checklist_${num_tienda}_LIDL.xlsx`;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+
+      document.getElementById('successMsg').textContent = `"${filename}" descargado correctamente.`;
+      successBanner.style.display = 'block';
+
+    } catch(err) {
+      errorBanner.textContent = '❌ ' + (err.message || 'No se pudo conectar con el servidor.');
+      errorBanner.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnTxt.textContent = '⬇ Generar y Descargar Excel';
+    }
+  }
+</script>
+</body>
+</html>
